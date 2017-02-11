@@ -10,6 +10,8 @@ class users{
     private $address;
     private $passwd;
     private $creditLimit;
+    private $res1;
+    private $res2;
     
     function __get($varName){
         return $this->$varName;
@@ -18,7 +20,7 @@ class users{
     function __set($varName,$value){
         $this->$varName = $value;
     }
-    function __construct($name,$pass,$email,$job,$birtd,$address,$credit){
+   /* function __construct($name,$pass,$email,$job,$birtd,$address,$credit){
         
         $this->name=$name;
         $this->passwd=sha1($pass);
@@ -28,7 +30,9 @@ class users{
         $this->birthDay=$birtd;
         $this->creditLimit=$credit;
         
-    }
+    }*/
+    
+     
     
     function insert(){
         
@@ -55,15 +59,43 @@ class users{
             echo("done");
         }else{
             
-            echo "failed to insert".$stmt->errno." : ".$stmt->error."<br>";
-            //echo ("failed to insert");
+            echo "failed to insert";
         }
         
     }
     function select(){
         
         global $mysqli;
-        $query="select username,email from users where username=? and password=?";
+        $query="select username,email from users where email=? and password=?";
+        $stmt = $mysqli->prepare($query);
+
+        if(!$stmt){
+            echo "preparation failed ".$mysqli->errno." : ".$mysqli->error."<br>";
+        }
+
+        $email= $this->email;
+        $pass = $this->passwd;
+        
+        $stmt->bind_param('ss',$email,$pass );
+        $stmt->execute();   
+        $result = $stmt->get_result();
+        $row = $result->fetch_array();
+        if($row){
+            $this -> res1 = $row['username'];
+            $this -> res2 = $row['email'];
+            //return 1;
+           echo "username = ".$row['username']."</br>";
+            echo "email = ".$row['email']; 
+        }
+        else
+            return 0;
+           echo "not exist";
+    }
+    
+    function update(){
+        
+        global $mysqli;
+        $query="update users set creditLimit=? where username=?";
         $stmt = $mysqli->prepare($query);
 
         if(!$stmt){
@@ -71,18 +103,21 @@ class users{
         }
 
         $username = $this->name;
-        $pass = $this->passwd;
+        $credit = $this->creditLimit;
+        echo "<br>".is_int($credit)."<br>";
+        echo "<br>"."name: ".$this->name."<br>";
         
-        $stmt->bind_param('ss',$username,$pass );
-        $stmt->execute();   
-        $result = $stmt->get_result();
-        $row = $result->fetch_array();
-        if($row){
-           echo "username = ".$row['username']."</br>";
-            echo "email = ".$row['email']; 
+        $stmt->bind_param('is',$credit,$this->name );
+        //$stmt->execute();
+        if($stmt->execute())
+            echo "done";
+        
+        if($stmt->affected_rows>0 ){
+            echo "done";
+        }else{
+            echo "failed to update ";
+            
         }
-        else
-            echo "not exist";
     }
     
     
