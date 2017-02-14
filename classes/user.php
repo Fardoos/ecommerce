@@ -10,8 +10,7 @@ class users{
     private $address;
     private $passwd;
     private $creditLimit;
-    private $res1;
-    private $res2;
+   
     
     function __get($varName){
         return $this->$varName;
@@ -20,19 +19,6 @@ class users{
     function __set($varName,$value){
         $this->$varName = $value;
     }
-   /* function __construct($name,$pass,$email,$job,$birtd,$address,$credit){
-        
-        $this->name=$name;
-        $this->passwd=sha1($pass);
-        $this->email=$email;
-        $this->address=$address;
-        $this->job=$job;
-        $this->birthDay=$birtd;
-        $this->creditLimit=$credit;
-        
-    }*/
-    
-     
     
     function insert(){
         
@@ -44,22 +30,23 @@ class users{
         }
 
         $username = $this->name;
-        $pass = $this->passwd;
+        $pass = sha1($this->passwd);
         $email = $this->email;
         $address = $this->address;
         $job = $this->job;
         $birtd = $this->birthDay;
-        $credit = $this->creditLimit;
+        $credit = intval($this->creditLimit);
         
-        $stmt->bind_param('sssssss',$username,$pass,$email,$job,$birtd,$address,$credit);
+        $stmt->bind_param('ssssssi',$username,$pass,$email,$job,$birtd,$address,$credit);
         $stmt->execute();
         
         if($stmt->affected_rows>0){
             
-            echo("done");
+            header("Location:basket.php");
         }else{
+            if($stmt->errno == 1062)
+                return "duplicat";
             
-            echo "failed to insert";
         }
         
     }
@@ -74,25 +61,21 @@ class users{
         }
 
         $email= $this->email;
-        $pass = $this->passwd;
+        $pass = sha1($this->passwd);
         
         $stmt->bind_param('ss',$email,$pass );
         $stmt->execute();   
         $result = $stmt->get_result();
         $row = $result->fetch_array();
-        if($row){
-            $this -> res1 = $row['username'];
-            $this -> res2 = $row['email'];
-            //return 1;
-           echo "username = ".$row['username']."</br>";
-            echo "email = ".$row['email']; 
+        if( $row){
+            return true; 
         }
         else
-            return 0;
-           echo "not exist";
+           return false;
+
     }
     
-    function update(){
+    function update_credit(){
         
         global $mysqli;
         $query="update users set creditLimit=? where username=?";
@@ -108,9 +91,7 @@ class users{
         echo "<br>"."name: ".$this->name."<br>";
         
         $stmt->bind_param('is',$credit,$this->name );
-        //$stmt->execute();
-        if($stmt->execute())
-            echo "done";
+        $stmt->execute();
         
         if($stmt->affected_rows>0 ){
             echo "done";
@@ -120,6 +101,79 @@ class users{
         }
     }
     
+    function selectAll(){
+        
+        global $mysqli;
+        $query="select * from users where email=? ";
+        $stmt = $mysqli->prepare($query);
+
+        if(!$stmt){
+            echo "preparation failed ".$mysqli->errno." : ".$mysqli->error."<br>";
+        }
+
+        $email= $this->email;
+        
+        
+        $stmt->bind_param('s',$email);
+        $stmt->execute();   
+        $result = $stmt->get_result();
+        return $result;
+        
+
+    }
+    
+    function update_passwd(){
+        
+        global $mysqli;
+        $query="update users set password=? where email=?";
+        $stmt = $mysqli->prepare($query);
+
+        if(!$stmt){
+            echo "preparation failed ".$mysqli->errno." : ".$mysqli->error."<br>";
+        }
+
+        $email = $this->email;
+        $passwd = sha1($this->passwd);
+       
+        
+        $stmt->bind_param('ss',$passwd,$email );
+        $stmt->execute();
+        
+        if($stmt->affected_rows>0 ){
+            return true;
+        }else{
+            return false;
+            
+        }
+    }
+    
+    function update_data(){
+        
+        global $mysqli;
+        $query="update users set username=?,job=?,birthDate=?,address=?,creditLimit=? where email=?";
+        $stmt = $mysqli->prepare($query);
+
+        if(!$stmt){
+            echo "preparation failed ".$mysqli->errno." : ".$mysqli->error."<br>";
+        }
+
+        $username = $this->name;
+        $email=$this->email;
+        $address = $this->address;
+        $job = $this->job;
+        $birtd = $this->birthDay;
+        $credit = intval($this->creditLimit);
+        
+        $stmt->bind_param('ssssis',$username,$job,$birtd,$address,$credit ,$email);
+        $stmt->execute();
+        
+        if($stmt->affected_rows>0 ){
+            return true;
+        }else{
+            return false;
+            
+        }
+    }
     
     
 }
