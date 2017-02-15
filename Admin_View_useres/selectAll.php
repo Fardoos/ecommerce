@@ -15,7 +15,7 @@ if($name == "choose user"){
     http_response_code(400);
 }
 
-$query="select * from users where username=? ";
+$query="select * from users where username=? and role=0 ";
 $stmt = $mysqli->prepare($query);
 
 if(!$stmt){
