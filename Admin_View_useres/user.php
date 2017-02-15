@@ -9,7 +9,7 @@ $dbname='ecommerce';
 $mysqli = new mysqli($dbhost, $dbuser,$dbpass);
 $mysqli->select_db($dbname);
 
-$query="select username from users ";
+$query="select username from users where role=0 ";
 $stmt = $mysqli->prepare($query);
 
 if(!$stmt){
@@ -263,7 +263,7 @@ $result = $stmt->get_result();
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>userNames</label>
-                                                <select id="usersList" class="selectpicker" >
+                                                <select id="usersList" class="form-control" >
                                                     <option value="choose user">choose user
                                                     </option>
                                                     <?php
