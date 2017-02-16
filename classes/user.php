@@ -76,6 +76,52 @@ class users{
            return false;
     }
     
+    function selectByName(){
+        
+        global $mysqli;
+        $query="select username from users where username=? ";
+        $stmt = $mysqli->prepare($query);
+
+        if(!$stmt){
+            echo "preparation failed ".$mysqli->errno." : ".$mysqli->error."<br>";
+        }
+
+        $name= $this->name;
+        
+        $stmt->bind_param('s',$name);
+        $stmt->execute();   
+        $result = $stmt->get_result();
+        $row = $result->fetch_array();
+        if( $row){
+            return true; 
+        }
+        else
+           return false;
+    }
+    
+    function selectByEmail(){
+        
+        global $mysqli;
+        $query="select email from users where email=? ";
+        $stmt = $mysqli->prepare($query);
+
+        if(!$stmt){
+            echo "preparation failed ".$mysqli->errno." : ".$mysqli->error."<br>";
+        }
+
+        $email= $this->email;
+        
+        $stmt->bind_param('s',$email);
+        $stmt->execute();   
+        $result = $stmt->get_result();
+        $row = $result->fetch_array();
+        if( $row){
+            return true; 
+        }
+        else
+           return false;
+    }
+    
     function insert_interests(){
         
         
