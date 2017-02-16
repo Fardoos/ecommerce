@@ -1,13 +1,14 @@
 <?php
 
 
-$dbhost= 'localhost';
+/*$dbhost= 'localhost';
 $dbuser= 'root';
 $dbpass='iti';
 $dbname='ecommerce';
 // open connection
 $mysqli = new mysqli($dbhost, $dbuser,$dbpass);
-$mysqli->select_db($dbname);
+$mysqli->select_db($dbname);*/
+require "config.php";
 
 $query="select username from users where role=0 ";
 $stmt = $mysqli->prepare($query);
@@ -62,7 +63,7 @@ $result = $stmt->get_result();
                     url: "selectAll.php",
                     method:"post",
                     data:"username="+$(this).val(),
-                      dataType: "text",
+                    dataType: "text",
                     success:function(data){
                        
                        var dataArr = jQuery.parseJSON(data);
@@ -286,13 +287,13 @@ $result = $stmt->get_result();
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Username</label>
-                                                <input type="text" class="form-control" placeholder="Username" id="name">
+                                                <input type="text" class="form-control" placeholder="Username" id="name" readonly>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1">Email address</label>
-                                                <input type="email" class="form-control" placeholder="Email" id="email">
+                                                <input type="email" class="form-control" placeholder="Email" id="email" readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -301,7 +302,7 @@ $result = $stmt->get_result();
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label>Address</label>
-                                                <input type="text" class="form-control" placeholder="Address" id="address">
+                                                <input type="text" class="form-control" placeholder="Address" id="address" readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -310,19 +311,19 @@ $result = $stmt->get_result();
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Job</label>
-                                                <input type="text" class="form-control" placeholder="Jop" id="job" >
+                                                <input type="text" class="form-control" placeholder="Jop" id="job" readonly>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>BirthDay</label>
-                                                <input type="text" class="form-control" placeholder="birthday" id="birth" >
+                                                <input type="text" class="form-control" placeholder="birthday" id="birth" readonly >
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Credit Limit</label>
-                                                <input type="text" class="form-control" placeholder="Credit" id="credit">
+                                                <input type="text" class="form-control" placeholder="Credit" id="credit" readonly >
                                             </div>
                                         </div>
                                     </div>
