@@ -9,14 +9,12 @@ $user->passwd = $_POST['pass'];
 $user->email= $_POST['email'];
 
  $res=$user->select();
+
 if($res == true)
-    //$result = "exist";
-    header("Location: customer-orders.php");
+    $result = "true";
 
 else if($res == false)
-    //$result = "not exist";
-     header("Location: register.php");
+    $result = "false";
 
-//echo $result;
-//echo json_encode($result);
+echo json_encode($result);
 ?>
