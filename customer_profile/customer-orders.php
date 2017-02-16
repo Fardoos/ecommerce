@@ -3,7 +3,7 @@ require_once 'user.php';
 session_start();
 require 'config.php';
 ob_start();
-//echo $_SESSION['email'];
+echo $_SESSION['email'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +19,7 @@ ob_start();
     <meta name="keywords" content="">
 
     <title>
-        Obaju : e-commerce template
+        Orders
     </title>
 
     <meta name="keywords" content="">
@@ -40,8 +40,24 @@ ob_start();
     <link href="css/custom.css" rel="stylesheet">
 
     <script src="js/respond.min.js"></script>
+    <script src="jquery-3.1.1.min.js"></script>
 
     <link rel="shortcut icon" href="favicon.png">
+    
+    <script>
+        $(function(){
+            
+            $("#logout").on("click",function(e){
+                
+                // virsual host  
+                // templete
+                //search
+                //contact us
+                
+            });//end logout
+            
+        });//end load
+    </script>
 
 
 
@@ -85,14 +101,12 @@ ob_start();
                                 <li class="active">
                                     <a href="customer-orders.php"><i class="fa fa-list"></i> My orders</a>
                                 </li>
-                                <li>
-                                    <a href="customer-wishlist.php"><i class="fa fa-heart"></i> My wishlist</a>
-                                </li>
+                               
                                 <li>
                                     <a href="customer-account.php"><i class="fa fa-user"></i> My account</a>
                                 </li>
                                 <li>
-                                    <a href="index.php"><i class="fa fa-sign-out"></i> Logout</a>
+                                    <a href="session_destroy.php"><i class="fa fa-sign-out" id="logout"></i> Logout</a>
                                 </li>
                             </ul>
                         </div>
