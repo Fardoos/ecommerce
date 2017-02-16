@@ -10,6 +10,8 @@ class users{
     private $address;
     private $passwd;
     private $creditLimit;
+    private $role;
+    private $interests=array();
    
     
     function __get($varName){
@@ -23,7 +25,7 @@ class users{
     function insert(){
         
         global $mysqli;
-        $query = "insert into users values(NULL,?,?,?,?,?,?,?)";
+        $query = "insert into users values(NULL,?,?,?,?,?,?,?,0)";
         $stmt = $mysqli -> prepare($query);
         if(!$stmt){
             echo "preparation failed ".$mysqli->errno." : ".$mysqli->error."<br>";
@@ -37,19 +39,72 @@ class users{
         $birtd = $this->birthDay;
         $credit = intval($this->creditLimit);
         
+        
         $stmt->bind_param('ssssssi',$username,$pass,$email,$job,$birtd,$address,$credit);
         $stmt->execute();
         
         if($stmt->affected_rows>0){
             
-            header("Location:basket.php");
+            return true;
         }else{
-            if($stmt->errno == 1062)
-                return "duplicat";
+                return false;
             
         }
         
     }
+    
+    function selectById(){
+        
+        global $mysqli;
+        $query="select id from users where email=? ";
+        $stmt = $mysqli->prepare($query);
+
+        if(!$stmt){
+            echo "preparation failed ".$mysqli->errno." : ".$mysqli->error."<br>";
+        }
+
+        $email= $this->email;
+        
+        $stmt->bind_param('s',$email);
+        $stmt->execute();   
+        $result = $stmt->get_result();
+        $row = $result->fetch_array();
+        if( $row){
+            return $row['id']; 
+        }
+        else
+           return false;
+    }
+    
+    function insert_interests(){
+        
+        
+        global $mysqli;
+        $current_id = $this-> selectById();
+        $query = "insert into userInterested values(NULL,?,?)";
+        $stmt = $mysqli -> prepare($query);
+        if(!$stmt){
+            echo "preparation failed ".$mysqli->errno." : ".$mysqli->error."<br>";
+        }
+
+        $interests = $this->interests;
+         if(!empty($interests)){
+             foreach($interests as $interest){
+                $stmt->bind_param('is',$current_id,$interest);
+                $stmt->execute();
+             }
+           }
+        
+        if($stmt->affected_rows>0){
+            
+            return true;
+        }else{
+                return false;
+            
+        }
+        
+    }
+    
     function select(){
         
         global $mysqli;
