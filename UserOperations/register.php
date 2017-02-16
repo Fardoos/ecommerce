@@ -1,3 +1,17 @@
+<?php
+require "config.php";
+
+$query="select title from categories where subCategory=1 ";
+$stmt = $mysqli->prepare($query);
+
+if(!$stmt){
+    echo "preparation failed ".$mysqli->errno." : ".$mysqli->error."<br>";
+}
+
+$stmt->execute();   
+$result = $stmt->get_result();
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,11 +25,106 @@
     <meta name="author" content="Ondrej Svestka | ondrejsvestka.cz">
     <meta name="keywords" content="">
     <script src="jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-hover-dropdown.js"></script>
     <!--Ajax Register validation -->
+   
     <script>
                 
-        /*$(function(){
+        $(function(){
             
+            
+            //name check ... 
+            $("#nameReg").on("blur",function(){
+                
+               $.ajax({
+                    url:"check.php",
+                    method:"post",
+                    data:"name="+$(this).val(),
+                    dataType:"json",
+                    success:function(data){
+                                        
+                        console.log(data);
+                      if(data == "true")
+                         {
+                            $("#lblNameReg").text(" Used Name !!");
+                            $("#nameReg").val(" ");
+                            $("#nameReg").focus();
+                             
+                        }
+
+                    },
+                    error: function(error){
+
+                    }
+                });// end ajax
+                
+            });//name blur end
+            
+            
+            //email check ... 
+            $("#emailReg").on("blur",function(){
+                
+               $.ajax({
+                    url:"check.php",
+                    method:"post",
+                    data:"email="+$(this).val(),
+                    dataType:"json",
+                    success:function(data){
+                                        
+                        console.log(data);
+                      if(data == "true")
+                         {
+                            $("#lblemailReg").text(" Used email !!");
+                            $("#emailReg").val("");
+                            $("#emailReg").focus();
+                             
+                        }
+
+                    },
+                    error: function(error){
+
+                    }
+                });// end ajax
+                
+            });//name blur end
+            
+            //register ... 
+            
+            $("#registerForm").on("submit",function(e){
+                
+                e.preventDefault();
+                $.ajax({
+                    url:"insert_user.php",
+                    method:"post",
+                    data:$("#registerForm").serialize(),
+                    dataType:"json",
+                    success:function(data){
+                        
+                        console.log("data"+data);
+                    
+                        if(data == "true"){
+                            
+                            window.location.href = "customer-orders.php";
+                        }
+                         else if(data == "false")
+                         {
+                            $("#lblNameReg").text(" Used Name !!");
+                            $("#nameReg").val(" ");
+                            $("#emailReg").val("");
+                            $("#nameReg").focus();
+                             
+                        }
+
+                    },
+                    error: function(error){
+
+                    }
+                });// end ajax
+                
+            });//register end
+            
+            // login ... 
             $("#LogForm").on("submit",function(e){
                 
                 e.preventDefault();
@@ -26,26 +135,84 @@
                     dataType:"json",
                     success:function(data){
                     
+                        if(data == "true"){
+                            
+                            window.location.href = "customer-orders.php";
+                        }
+                         else if(data == "false")
+                         {
+                            $("#lblNameLog").text("Wrong Entered data !!");
+                            $("#emailLog").val(" ");
+                            $("#passwordLog").val("");
+                            $("#emailLog").focus();
+                            
+                        }
 
                     },
                     error: function(error){
 
-                        console.log("error");
-                         if(data == false){
-                            $("#lblNameLog").text("Wrong Entered data !!");
-                            $("#emailLog").val(" ");
-                            $("#passwordLog").val(" ");
-                            $("#emailLog").focus();
-                        }
                     }
                 });// end ajax
-            });//end btn click
-        });*/
+            });//end btnLog click
+            
+            // interested ------------------------------
+            
+            $("#categoryList").on("change",function(){
+                
+                
+                $("#checkList").empty();
+                $.ajax({
+                    
+                    url: "subcategory.php",
+                    method:"post",
+                    data:"category="+$(this).val(),
+                    dataType:"text",
+                    success:function(data){
+                        
+                        console.log(data);
+                        
+                        var dataArr = jQuery.parseJSON(data);
+                        for( var i = 0 ; i< dataArr.length ; i++){
+                            var txt= dataArr[i];
+                            $("#checkList").append('<input type="checkbox" class="check" name="interests[]" value="'+txt+'"/> '+ txt +'<br />');
+
+                        }
+                          
+                    },
+                    error: function(error){
+                        
+                        console.log("error");
+                    }
+                    
+                    
+                });//ajaxend
+                
+            });//check end
+            
+            // email .. 
+            function validateEmail(email) {
+              var pattern = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return pattern.test(email);
+            }
+            $("#emailReg").on("blur",function(){
+                
+                
+              $("#lblemailReg").text("");
+              var email = $("#emailReg").val();
+              if (!validateEmail(email)) {
+                $("#lblemailReg").text(email + " is not valid email");
+                $("#emailReg").focus();
+              }
+              return false;
+            });//blur
+            
+     
+        });
     </script>
 
 
     <title>
-        E-Commerce Register
+         Register
     </title>
 
     <meta name="keywords" content="">
@@ -102,23 +269,24 @@
 
                         <p class="lead">Not our registered customer yet?</p>
                         <p>With registration with us new world of fashion, fantastic discounts and much more opens to you! The whole process will not take you more than a minute!</p>
-                       <!-- <p class="text-muted">If you have any questions, please feel free to <a href="contact.html">contact us</a>, our customer service center is working for you 24/7.</p>-->
 
                         <hr>
                         <!--customer-orders.html-->
-                        <form action="insert_user.php" method="post">
-                            <div class="form-group">
-                                <label for="name">Name</label>
-                                <input type="text" name="name" class="form-control" id="name" required>
-                            </div>
-                            <div class="form-group">
-                                <label id="lblName" name="lblName"></label>
+                        <form id="registerForm" action="insert_user.php" method="post">
+                           
+                           <div class="form-group">
+                                <label id="lblNameReg" name="lblName" class="label label-warning"></label>
                                 
                             </div>
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" name="name" class="form-control" id="nameReg" required>
+                            </div>
                             
+                            <label id="lblemailReg" name="lblName" class="label label-warning"></label>
                             <div class="form-group">
                                 <label for="email">Email</label>
-                                <input type="text" name="email" class="form-control" id="email" required>
+                                <input type="text" name="email" class="form-control" id="emailReg" required>
                             </div>
                             <!-- re enter-->
                             <div class="form-group">
@@ -127,21 +295,48 @@
                             </div>
                             <div class="form-group">
                                 <label for="job">Job</label>
-                                <input type="text" name="job" class="form-control" id="job">
+                                <input type="text" name="job" class="form-control" id="job" required>
                             </div>
                                 <!--value-->
                             <div class="form-group">
-                                <label for="Birthday">Birthday</label>
-                                <input type="date" name="birthday" class="form-control" id="Birthday" >
+                                <label for="Birthday">Birth Date</label>
+                                <input type="date" name="birthday" class="form-control" id="Birthday" required>
                             </div>
                             <div class="form-group">
                                 <label for="address">Address</label>
-                                <input type="text"  name="address"class="form-control" id="address" >
+                                <input type="text"  name="address"class="form-control" id="address" required>
                             </div>
                             <div class="form-group">
                                 <label for="credit">Credit Limit</label>
-                                <input type="number" name="credit" class="form-control" id="credit" required>
+                                <input type="number" min="1" name="credit" class="form-control" id="credit" required>
                             </div>
+                            <div class="row">
+                            <div class="col-md-5">
+                             <div class="form-group">
+                                <label>Interested</label>
+                                <select id="categoryList" class="form-control" >
+                                    <option value="choose user">choose category
+                                    </option>
+                                    <?php
+        
+                                        while($row = $result->fetch_array()) {
+
+                                            echo "<option>"
+                                                .$row['title']."</option>";
+
+                                        }   
+
+                                    ?>
+
+                                </select>
+                            </div>
+                            </div>
+                            <div class="col-md-5">
+                             <div id="checkList" class="form-group">
+                               
+                            </div>
+                            </div>
+                            </div>         
                             <div class="text-center">
                                 <button type="submit" class="btn btn-primary"><i class="fa fa-user-md"></i> Register</button>
                             </div>
@@ -155,14 +350,12 @@
                         <h1>Login</h1>
 
                         <p class="lead">Already our customer?</p>
-                        <p class="text-muted">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies
-                            mi vitae est. Mauris placerat eleifend leo.</p>
 
                         <hr>
                         <!--customer-orders.html-->
-                        <form action="select_user.php" method="post"  enctype="application/x-www-form-urlencoded" id="LogForm">
+                        <form action="customer-orders.php" method="post"  enctype="application/x-www-form-urlencoded" id="LogForm">
                            <div class="form-group">
-                                <label id="lblNameLog" name="lblName"></label>
+                                <label id="lblNameLog" name="lblName" class="label label-danger" ></label>
                                 
                             </div>
                             <div class="form-group">
