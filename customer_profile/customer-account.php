@@ -4,6 +4,7 @@ session_start();
 require 'config.php';
 ob_start();
 $email= $_SESSION['email'];
+echo $email;
 $user = new users();
 $user->email = $email;
 $result = $user->selectAll();
@@ -51,18 +52,6 @@ $row = $result->fetch_array();
     <script>
         $(function(){
             
-            $("#password_old").on("blur",function(){
-                
-                if($(this).val() != "<?= $row['password']?>"){
-                   
-                   $("#lblOldPass").text("Wrong password");
-                   $(this).val("");
-                   $("#password_old").focus(); 
-                }
-                else
-                   $("#lblOldPass").text(""); 
-                
-            });//oldpass_blur
             
              $("#password_2").on("blur",function(){
                 
@@ -191,13 +180,10 @@ $row = $result->fetch_array();
                                     <a href="customer-orders.php"><i class="fa fa-list"></i> My orders</a>
                                 </li>
                                 <li>
-                                    <a href="customer-wishlist.php"><i class="fa fa-heart"></i> My wishlist</a>
-                                </li>
-                                <li>
                                     <a href="customer-account.php"><i class="fa fa-user"></i> My account</a>
                                 </li>
                                 <li>
-                                    <a href="index.php"><i class="fa fa-sign-out"></i> Logout</a>
+                                    <a href="session_destroy.php" id="logout"><i class="fa fa-sign-out"></i> Logout</a>
                                 </li>
                             </ul>
                         </div>
@@ -217,15 +203,7 @@ $row = $result->fetch_array();
                         <h3>Change password</h3>
 
                         <form id="passForm" action="update_pass.php" method="post">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label id="lblOldPass" ></label><br>
-                                        <label for="password_old">Old password</label>
-                                        <input type="password" class="form-control" id="password_old" required>
-                                    </div>
-                                </div>
-                            </div>
+                       
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
@@ -236,7 +214,7 @@ $row = $result->fetch_array();
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                       <label id="lblTryPass" class="label label-warning"></label>
+                                       <label id="lblTryPass" class="label label-danger"></label>
                                         <br>
                                         <label for="password_2">Retype new password</label>
                                         <input type="password" class="form-control" id="password_2" required>
